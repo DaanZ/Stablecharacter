@@ -42,3 +42,4 @@ next-env.d.ts
 
 api/__pycache__
 google_secret.json
+/.idea

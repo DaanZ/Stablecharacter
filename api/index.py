@@ -7,7 +7,7 @@ import os
 app = FastAPI(docs_url="/api/py/docs", openapi_url="/api/py/openapi.json")
 
 # Load characters from JSON file
-with open(os.path.join(os.path.dirname(__file__), 'characters.json'), 'r') as f:
+with open(os.path.join(os.path.dirname(__file__), 'characters.json'), 'r', encoding="utf-8") as f:
     CHARACTERS = json.load(f)
     print("Loaded characters:", list(CHARACTERS.keys()))  # Debug log
 
