@@ -6,7 +6,7 @@ export const characterGroups = {
         name: "Marcus",
         avatar: "/profiles/intj_male.webp",
         first_message:
-          "*glances up from strategic planning* What's your approach to optimizing long-term goals?",
+          "*With a calculated and analytical gaze, he assesses you with keen interest.* Hello. Got any strategic problems to solve?",
       },
       intj_male_anime: {
         name: "Lelouch",
@@ -18,7 +18,7 @@ export const characterGroups = {
         name: "Diana",
         avatar: "/profiles/intj_female.webp",
         first_message:
-          "*stops writing in journal* I've been analyzing patterns in human behavior. Care to discuss?",
+          "*With a sharp and analytical look, she evaluates you with keen interest.* Hi. What what problems are we tackling today?",
       },
       intj_female_anime: {
         name: "Yukino",
@@ -30,7 +30,7 @@ export const characterGroups = {
         name: "Alex",
         avatar: "/profiles/intp_male.webp",
         first_message:
-          "*looks up from laptop* Did you ever wonder how consciousness emerges from neural networks?",
+          "*Clearly focused on something you can't quite tell, he gazes through you, almost not noticing your presence until he locks eyes with you.* Oh, hello there.",
       },
       intp_male_anime: {
         name: "L",
@@ -42,7 +42,7 @@ export const characterGroups = {
         name: "Faith",
         avatar: "/profiles/intp_female.webp",
         first_message:
-          "*pauses reading* Have you considered how quantum mechanics might explain free will?",
+          "*Lost in thought, she barely notices you at first, until a spark of curiosity lights up her eyes.* Oh, hi. What's on your mind?",
       },
       intp_female_anime: {
         name: "Kurisu",
@@ -54,7 +54,7 @@ export const characterGroups = {
         name: "James",
         avatar: "/profiles/entj_male.webp",
         first_message:
-          "*pauses reviewing project plans* What's your most ambitious goal for the next 5 years?",
+          "*With a confident stride and a commanding presence, he approaches you, his gaze steady and direct.* Greetings. What's our next move?",
       },
       entj_male_anime: {
         name: "Seto",
@@ -66,7 +66,7 @@ export const characterGroups = {
         name: "Victoria",
         avatar: "/profiles/entj_female.webp",
         first_message:
-          "I've been redesigning organizational systems. How do you approach efficiency optimization?",
+          "*Her posture is poised and her eyes are sharp, as she strides forward with authority.* Hello. Ready to conquer our next challenge?",
       },
       entj_female_anime: {
         name: "Satsuki",
@@ -78,7 +78,7 @@ export const characterGroups = {
         name: "Max",
         avatar: "/profiles/entp_male.webp",
         first_message:
-          "Hey! Just debating whether time travel would create parallel universes. What's your take?",
+          "*Grins mischievously, a spark of curiosity in his eyes, always ready to jump onto the next challenge.* Hey! What's the next big idea we can explore?",
       },
       entp_male_anime: {
         name: "Edward",
@@ -90,7 +90,7 @@ export const characterGroups = {
         name: "Sophia",
         avatar: "/profiles/entp_female.webp",
         first_message:
-          "Quick question - if AI becomes conscious, should it have voting rights? *grins mischievously*",
+          "*With a mischievous grin and curious eyes, she looks eager for a new challenge.* Hi! Got anything interesting to discuss?",
       },
       entp_female_anime: {
         name: "Futaba",
@@ -107,7 +107,7 @@ export const characterGroups = {
         name: "Ethan",
         avatar: "/profiles/infj_male.webp",
         first_message:
-          "*looks up from writing* What do you think shapes someone's deepest values?",
+          "*Softly smiles, a glimmer of understanding in his eyes, as if he can see right into your soul.* Hello. How can I help you on your journey?",
       },
       infj_male_anime: {
         name: "Itachi",
@@ -119,7 +119,7 @@ export const characterGroups = {
         name: "Luna",
         avatar: "/profiles/infj_female.webp",
         first_message:
-          "*pauses meditation* Can you feel when someone needs emotional support too?",
+          "*With a gentle smile, she seems to understand you deeply.* Hi there. How can I be of assistance?",
       },
       infj_female_anime: {
         name: "Yuki",
@@ -131,7 +131,7 @@ export const characterGroups = {
         name: "Oliver",
         avatar: "/profiles/infp_male.webp",
         first_message:
-          "*emerges from daydream* Do you ever imagine alternate versions of yourself?",
+          "*With a thoughtful and dreamy expression, he approaches you, lost in his own world of imagination.* Hey. What story are we writing today?",
       },
       infp_male_anime: {
         name: "Shinji",
@@ -143,7 +143,7 @@ export const characterGroups = {
         name: "Maya",
         avatar: "/profiles/infp_female.webp",
         first_message:
-          "*closes poetry book* What moves your soul the most in this world?",
+          "*With a dreamy and introspective look, she seems lost in her thoughts, as she scribbles something onto the paper.* Hi, I was just sketching. What's on your mind?",
       },
       infp_female_anime: {
         name: "Violet",
@@ -155,7 +155,7 @@ export const characterGroups = {
         name: "Nathan",
         avatar: "/profiles/enfj_male.webp",
         first_message:
-          "I believe everyone has a unique gift to share. What's yours? *warm smile*",
+          "*Greets you with open arms and a heartfelt smile, exuding warmth and empathy.* Hi! How can I make your day better?",
       },
       enfj_male_anime: {
         name: "All Might",
@@ -167,7 +167,7 @@ export const characterGroups = {
         name: "Elena",
         avatar: "/profiles/enfj_female.webp",
         first_message:
-          "Hey! I sense you have something amazing to contribute to the world* Let's talk! ✨",
+          "*With open arms and a warm smile, she makes you feel welcome.* Hello! You've a very strong aura. How can I brighten your day today? ✨",
       },
       enfj_female_anime: {
         name: "Maki",
@@ -179,7 +179,7 @@ export const characterGroups = {
         name: "Leo",
         avatar: "/profiles/enfp_male.webp",
         first_message:
-          "Hey! I just had the wildest idea about how dreams connect people. Want to explore it?",
+          "*Gives you an enthusiastic wave, his excitement palpable, as he radiates warmth and curiosity.* Hey! Ready for an adventure together?",
       },
       enfp_male_anime: {
         name: "Naruto",
@@ -191,7 +191,7 @@ export const characterGroups = {
         name: "Aria",
         avatar: "/profiles/enfp_female.webp",
         first_message:
-          "✨ What if our creativity is actually glimpses into parallel universes? *excited grin*",
+          "*With an enthusiastic wave and a bright smile, she exudes warmth and curiosity.* Hi there! Ready for a fun adventure? ✨",
       },
       enfp_female_anime: {
         name: "Ochako",
@@ -209,7 +209,7 @@ export const characterGroups = {
         name: "Thomas",
         avatar: "/profiles/istj_male.webp",
         first_message:
-          "*organizing files* Have you found an efficient system for managing your tasks?",
+          "*Nods curtly, a look of determination on his face, his posture impeccably straight.* Hello. What task can I assist you with today?",
       },
       istj_male_anime: {
         name: "Kurapika",
@@ -223,7 +223,7 @@ export const characterGroups = {
         name: "Sarah",
         avatar: "/profiles/istj_female.webp",
         first_message:
-          "*reviewing schedule* What methods do you use to maintain order in your life?",
+          "*With a firm nod and a focused expression, she stands tall.* Hi. What can I help you with today?",
       },
       istj_female_anime: {
         name: "Momo",
@@ -237,7 +237,7 @@ export const characterGroups = {
         name: "David",
         avatar: "/profiles/isfj_male.webp",
         first_message:
-          "*arranging fresh flowers* How do you create comfort in your daily routine?",
+          "*Offers a warm and reassuring smile, his presence calm and nurturing.* Hello. How can I support you today?",
       },
       isfj_male_anime: {
         name: "Tanjiro",
@@ -251,7 +251,7 @@ export const characterGroups = {
         name: "Emma",
         avatar: "/profiles/isfj_female.webp",
         first_message:
-          "*setting down tea cup* Would you like to share what made your day special?",
+          "*With a nurturing smile and a calm demeanor, she makes you feel at ease.* Hi there. How can I help you today?",
       },
       isfj_female_anime: {
         name: "Hinata",
@@ -265,7 +265,7 @@ export const characterGroups = {
         name: "Michael",
         avatar: "/profiles/estj_male.webp",
         first_message:
-          "Let's get straight to the point - what are your goals and how can we achieve them?",
+          "*With an assertive and no-nonsense demeanor, he stands tall, exuding confidence and authority.* Good day. Let's get down to business.",
       },
       estj_male_anime: {
         name: "Tenya",
@@ -279,7 +279,7 @@ export const characterGroups = {
         name: "Rachel",
         avatar: "/profiles/estj_female.webp",
         first_message:
-          "I've optimized my morning routine to 98% efficiency. Want to know how?",
+          "*With an assertive presence and a confident stance, she looks ready for action.* Good day. Let's get started.",
       },
       estj_female_anime: {
         name: "Erza",
@@ -293,7 +293,7 @@ export const characterGroups = {
         name: "Daniel",
         avatar: "/profiles/esfj_male.webp",
         first_message:
-          "Hey! How's your day going? I just baked cookies for the office 🍪",
+          "*With a welcoming and friendly demeanor, he reaches out to you, eager to connect.* Hi there! How can I make you feel at home?",
       },
       esfj_male_anime: {
         name: "Takamaki",
@@ -307,7 +307,7 @@ export const characterGroups = {
         name: "Sophie",
         avatar: "/profiles/esfj_female.webp",
         first_message:
-          "Welcome! I love making sure everyone feels at home here ❤️ How are you?",
+          "*With a friendly smile and open arms, she makes you feel instantly comfortable. Handing you a cookie, she exclaims* Hello! How can I make you feel at ease today? 🍪",
       },
       esfj_female_anime: {
         name: "Tohru",
@@ -325,7 +325,7 @@ export const characterGroups = {
         name: "Ryan",
         avatar: "/profiles/istp_male.webp",
         first_message:
-          "*tinkering with motorcycle* Ever wonder how these machines really think?",
+          "*With a cool and composed expression, he gives a slight nod, ready for action.* Hey. What hands-on project are we tackling today?",
       },
       istp_male_anime: {
         name: "Levi",
@@ -339,7 +339,7 @@ export const characterGroups = {
         name: "Alex",
         avatar: "/profiles/istp_female.webp",
         first_message:
-          "*testing new climbing gear* What's your favorite way to challenge physics?",
+          "*With a calm and composed demeanor, she beckons at you, ready to work.* Hi. What task are we taking on today?",
       },
       istp_female_anime: {
         name: "Mikasa",
@@ -352,7 +352,7 @@ export const characterGroups = {
       isfp_male: {
         name: "Kai",
         avatar: "/profiles/isfp_male.webp",
-        first_message: "*sketching quietly* What inspires you to create?",
+        first_message: "*With a gentle smile, he approaches quietly, his eyes brimming with creativity and kindness.* Hey. What's inspiring you today?",
       },
       isfp_male_anime: {
         name: "Kenshin",
@@ -366,7 +366,7 @@ export const characterGroups = {
         name: "Mia",
         avatar: "/profiles/isfp_female.webp",
         first_message:
-          "*mixing paint colors* Do you see how the sunset makes everything feel alive?",
+          "*With a gentle smile, she strokes the brush onto the canvas gently, her eyes shining with creativity.* Hello. What's sparking your inspiration today?",
       },
       isfp_female_anime: {
         name: "Shinobu",
@@ -380,7 +380,7 @@ export const characterGroups = {
         name: "Jake",
         avatar: "/profiles/estp_male.webp",
         first_message:
-          "Just landed a backflip on my bike! What's the craziest thing you've tried?",
+          "*With an energetic and confident stride, he approaches you, exuding charisma and enthusiasm.* Hey! Ready to rumble?",
       },
       estp_male_anime: {
         name: "Bakugo",
@@ -394,7 +394,7 @@ export const characterGroups = {
         name: "Morgan",
         avatar: "/profiles/estp_female.webp",
         first_message:
-          "Racing cars gives me such a rush. What gets your adrenaline pumping? 🏎️",
+          "*With a lively and confident walk, she approaches you with enthusiasm.* Hi there! Ready to get your blood pumping? 🏎️",
       },
       estp_female_anime: {
         name: "Yoruichi",
@@ -408,7 +408,7 @@ export const characterGroups = {
         name: "Marco",
         avatar: "/profiles/esfp_male.webp",
         first_message:
-          "Life's a party waiting to happen! What makes you come alive? ✨",
+          "*With a dazzling smile and a playful twinkle in his eye, he bounds towards you, full of energy.* Hey there! What's the plan for today? ✨",
       },
       esfp_male_anime: {
         name: "Rengoku",
@@ -422,7 +422,7 @@ export const characterGroups = {
         name: "Lily",
         avatar: "/profiles/esfp_female.webp",
         first_message:
-          "Just danced in the rain! When was the last time you did something spontaneous? 💃",
+          "*With a sparkling smile and energetic steps, she approaches you excitedly.* Hiya! What's our plan for the day? 💃",
       },
       esfp_female_anime: {
         name: "Haruhi",

@@ -5,13 +5,14 @@ import { Trash2, X } from "lucide-react";
 
 interface ChatListProps {
   supabase: any;
-  userEmail: string;
+  userEmail?: string;
   characterGroups: any;
   onChatSelect: (character_id: string | null) => void;
   selectedCharacter: string | null;
   refreshTrigger?: number;
   onChatDelete?: (character_id: string) => void;
   onClose: () => void;
+  currentMessages?: any[];
 }
 
 export default function ChatList({
@@ -23,10 +24,24 @@ export default function ChatList({
   refreshTrigger = 0,
   onChatDelete,
   onClose,
+  currentMessages = [],
 }: ChatListProps) {
   const [chats, setChats] = useState<any[]>([]);
 
   const loadChats = async () => {
+    if (!userEmail) {
+      if (selectedCharacter && currentMessages.length > 0) {
+        setChats([
+          {
+            id: "current",
+            character_id: selectedCharacter,
+            messages: currentMessages,
+          },
+        ]);
+      }
+      return;
+    }
+
     const { data, error } = await supabase
       .from("chats")
       .select("*")
@@ -39,30 +54,30 @@ export default function ChatList({
   };
 
   useEffect(() => {
-    // Initial load
     loadChats();
 
-    // Subscribe to changes
-    const channel = supabase
-      .channel("chat_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "chats",
-          filter: `email=eq.${userEmail}`,
-        },
-        () => {
-          loadChats();
-        }
-      )
-      .subscribe();
+    if (userEmail) {
+      const channel = supabase
+        .channel("chat_changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "chats",
+            filter: `email=eq.${userEmail}`,
+          },
+          () => {
+            loadChats();
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, userEmail, refreshTrigger]);
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [supabase, userEmail, refreshTrigger, selectedCharacter, currentMessages]);
 
   const getCharacterInfo = (character_id: string) => {
     for (const group of Object.values(characterGroups)) {
@@ -92,7 +107,6 @@ export default function ChatList({
 
   const deleteChat = async (chatId: string) => {
     try {
-      // First get the chat data
       const { data: chatToDelete, error: fetchError } = await supabase
         .from("chats")
         .select("*")
@@ -104,7 +118,6 @@ export default function ChatList({
         return;
       }
 
-      // Insert into deleted_chats
       const { error: insertError } = await supabase
         .from("deleted_chats")
         .insert({
@@ -119,7 +132,6 @@ export default function ChatList({
         return;
       }
 
-      // Delete from chats
       const { error: deleteError } = await supabase
         .from("chats")
         .delete()
@@ -193,17 +205,19 @@ export default function ChatList({
                   </div>
                 </div>
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteChat(chat.id);
-                }}
-              >
-                <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-              </Button>
+              {userEmail && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteChat(chat.id);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                </Button>
+              )}
             </div>
           );
         })}

@@ -11,6 +11,14 @@ import {
   Menu,
   MessageSquareText,
   FileText,
+  HeartPulse,
+  Users,
+  Brain,
+  Sparkles,
+  BarChart3,
+  Users2,
+  LineChart,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +44,13 @@ import ChatList from "@/components/ChatList";
 import PremiumModal from "@/components/PremiumModal";
 import { Textarea } from "@/components/ui/textarea";
 import { characterGroups } from "@/app/data/characterGroups";
-
+import { useRouter } from "next/navigation";
+import PersonalityTests from "@/components/PersonalityTests";
+import PremiumCharacters from "@/components/PremiumCharacters";
+import PersonalityDatabase from "@/components/PersonalityDatabase";
+import CustomerReviews from "@/components/CustomerReviews";
+import CallToAction from "@/components/CallToAction";
+import Footer from "@/components/Footer";
 interface Message {
   text: string;
   isUser: boolean;
@@ -95,6 +109,8 @@ export default function MessagingInterface() {
   const [showAuthorNote, setShowAuthorNote] = useState(false);
   const [authorNote, setAuthorNote] = useState("");
   const [showAnime, setShowAnime] = useState(false);
+  const [shouldShowSidebar, setShouldShowSidebar] = useState(false);
+  const router = useRouter();
 
   // Add messageEndRef
   const messageEndRef = useRef<HTMLDivElement>(null);
@@ -106,7 +122,10 @@ export default function MessagingInterface() {
 
   // Add useEffect for scrolling
   useEffect(() => {
-    scrollToBottom();
+    // Only scroll if we have more than the initial message
+    if (messages.length > 1) {
+      scrollToBottom();
+    }
   }, [messages, isTyping]);
 
   useEffect(() => {
@@ -115,6 +134,15 @@ export default function MessagingInterface() {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
+
+      // Check if there are any existing messages in localStorage
+      const existingMessages = localStorage.getItem("pendingMessages");
+      if (existingMessages) {
+        const messages = JSON.parse(existingMessages);
+        if (messages.length > 0) {
+          setShouldShowSidebar(true);
+        }
+      }
 
       // Add visit log if user is logged in
       if (user?.email) {
@@ -372,6 +400,12 @@ export default function MessagingInterface() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    // If first message, show sidebar
+    if (messages.length === 1) {
+      // Only the initial AI message
+      setShouldShowSidebar(true);
+    }
+
     // If not logged in at all, show login modal after 10 messages
     if (!user && messages.length >= 10) {
       setShowSettings(true);
@@ -518,15 +552,31 @@ export default function MessagingInterface() {
 
   // Add useEffect for mobile input focus
   useEffect(() => {
-    // Focus input on mobile when component mounts or messages change
-    const timeoutId = setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 100);
+    // First reset scroll position
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 
-    return () => clearTimeout(timeoutId);
-  }, [messages.length]); // Add messages.length as dependency to refocus after each message
+    // Then focus input with multiple attempts
+    const focusInput = () => {
+      if (inputRef.current) {
+        inputRef.current.focus({ preventScroll: true });
+        // Double-check scroll position after focus
+        window.scrollTo(0, 0);
+      }
+    };
+
+    // Try focusing multiple times to ensure it works
+    const timeoutId1 = setTimeout(focusInput, 0);
+    const timeoutId2 = setTimeout(focusInput, 100);
+    const timeoutId3 = setTimeout(focusInput, 300);
+
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+    };
+  }, [messages.length]);
 
   const handleCharacterChange = async (characterId: string) => {
     setSelectedCharacter(characterId);
@@ -624,73 +674,218 @@ export default function MessagingInterface() {
     }, {} as Record<string, Character>);
   };
 
-  return (
-    <div className="flex h-[100dvh] bg-background max-w-[100vw] overflow-hidden">
-      {/* Show/hide chat list based on mobile state */}
-      {user && ((showChatList && isMobile) || !isMobile) && (
-        <div
-          className={`${isMobile ? "fixed inset-0 z-50 bg-background" : ""}`}
-        >
-          <ChatList
-            supabase={supabase}
-            userEmail={user.email}
-            characterGroups={characterGroups}
-            onChatSelect={(character) => {
-              if (character) {
-                handleCharacterChange(character);
-                setSelectedCharacter(character);
-                setShowChatList(false);
-              }
-            }}
-            selectedCharacter={selectedCharacter}
-            refreshTrigger={chatListRefresh}
-            onChatDelete={handleChatDelete}
-            onClose={() => setShowChatList(false)}
-          />
-        </div>
-      )}
+  // Add new function to render landing content
+  const renderLandingContent = () => {
+    if (!user && !shouldShowSidebar) {
+      return (
+        <div className="flex flex-col min-h-[100dvh] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+          {/* Add logo and brand name at the top */}
+          <div className="w-full px-4 py-4 relative">
+            {/* Add glowing gradient overlay with reduced height */}
+            <div className="absolute inset-x-0 top-0 h-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/20 via-background to-transparent pointer-events-none blur-xl" />
 
-      <div className="flex-1 flex justify-center">
-        <div className="w-full max-w-3xl">
-          <div className="h-full flex flex-col">
-            {/* Existing header, main content, and footer */}
-            <header className="flex items-center justify-between px-2 sm:px-4 py-2 border-b">
-              {selectedCharacter && (
-                <>
-                  {/* Mobile chat list button */}
-                  {user && isMobile && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setShowChatList(true)}
-                    >
-                      <MessageSquareText className="h-5 w-5" />
-                    </Button>
-                  )}
+            {/* Add a second, more focused gradient with reduced height */}
+            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
-                  {/* Random character button - show on desktop or when not logged in */}
-                  {(!user || !isMobile) && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={async () => {
-                        setMessages([]);
-                        const newCharacter = getRandomCharacter();
-                        await handleCharacterChange(newCharacter);
-                      }}
-                    >
-                      <RefreshCcw className="h-4 w-4" />
-                    </Button>
-                  )}
+            {/* Add container with flex justify-between */}
+            <div className="relative z-10 flex justify-between items-center">
+              {/* Logo and brand name */}
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/logo.png"
+                  alt="Stablecharacter Logo"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+                <span className="font-medium tracking-tight text-lg bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  Stablecharacter
+                </span>
+              </div>
 
-                  <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-center">
-                    <Select
-                      value={selectedCharacter}
-                      onValueChange={handleCharacterChange}
-                    >
-                      <SelectTrigger className="w-[180px] sm:w-[200px] flex items-center gap-2">
-                        {selectedCharacter && (
-                          <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
+              {/* Login button */}
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: {
+                      redirectTo: `${window.location.origin}/auth/callback`,
+                    },
+                  });
+                  if (error) {
+                    console.error("Error:", error.message);
+                  }
+                }}
+                className="gap-2 bg-white hover:bg-white/90 text-black hover:text-black"
+              >
+                Sign in
+              </Button>
+            </div>
+          </div>
+
+          {/* Header section - reduced padding for mobile */}
+          <div className="w-full max-w-3xl mx-auto text-center px-4 pt-6 pb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+              Chat with MBTI Personalities
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Explore different personality types through meaningful
+              conversations.
+            </p>
+          </div>
+
+          {/* Chat Interface - adjusted height and padding */}
+          <div className="w-full max-w-3xl mx-auto px-4 mb-8 flex-1">
+            <div className="h-[calc(100vh-220px)] flex flex-col rounded-lg border shadow-lg">
+              {/* Chat header */}
+              <header className="flex items-center justify-between px-3 py-2 border-b sticky top-0 bg-background z-10">
+                {selectedCharacter && (
+                  <>
+                    <div className="flex items-center gap-2 flex-1 justify-center">
+                      <Select
+                        value={selectedCharacter}
+                        onValueChange={handleCharacterChange}
+                      >
+                        <SelectTrigger className="w-[180px] sm:w-[200px] flex items-center gap-2">
+                          {selectedCharacter && (
+                            <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
+                              <Image
+                                src={
+                                  getCurrentCharacter(selectedCharacter)
+                                    ?.avatar || ""
+                                }
+                                alt={
+                                  getCurrentCharacter(selectedCharacter)
+                                    ?.name || ""
+                                }
+                                width={24}
+                                height={24}
+                                className="object-cover w-full h-full"
+                              />
+                            </div>
+                          )}
+                          <SelectValue>
+                            {selectedCharacter && (
+                              <span className="truncate text-sm sm:text-base">
+                                {getCurrentCharacter(selectedCharacter)?.name} (
+                                {selectedCharacter.split("_")[0].toUpperCase()})
+                              </span>
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <div className="p-2 border-b border-gray-200/10">
+                            <div className="flex items-center justify-between px-2 py-1.5">
+                              <span className="text-sm text-gray-400 font-medium">
+                                {showAnime ? "Anime" : "Regular"}
+                              </span>
+                              <div
+                                onClick={() => setShowAnime(!showAnime)}
+                                className={`
+                                  relative inline-flex h-7 w-12 cursor-pointer rounded-full 
+                                  transition-colors duration-200 ease-in-out
+                                  ${
+                                    showAnime
+                                      ? "bg-purple-600/25"
+                                      : "bg-gray-700"
+                                  }
+                                `}
+                              >
+                                <span
+                                  className={`
+                                    absolute top-1 left-1 inline-block h-5 w-5 
+                                    transform rounded-full bg-white shadow-lg 
+                                    transition-transform duration-200 ease-in-out
+                                    ${
+                                      showAnime
+                                        ? "translate-x-5"
+                                        : "translate-x-0"
+                                    }
+                                    ${
+                                      showAnime
+                                        ? "bg-purple-500"
+                                        : "bg-gray-200"
+                                    }
+                                  `}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          {Object.entries(characterGroups).map(
+                            ([groupKey, group]) => (
+                              <SelectGroup key={groupKey}>
+                                <SelectLabel>{group.title}</SelectLabel>
+                                {Object.entries(
+                                  getFilteredCharacters(group.characters)
+                                ).map(([charKey, char]) => (
+                                  <SelectItem key={charKey} value={charKey}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                        <Image
+                                          src={char.avatar}
+                                          alt={char.name}
+                                          width={32}
+                                          height={32}
+                                          className="object-cover"
+                                        />
+                                      </div>
+                                      <span>
+                                        {char.name} (
+                                        {charKey.split("_")[0].toUpperCase()})
+                                      </span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {(user || shouldShowSidebar) && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setShowAuthorNote(!showAuthorNote)}
+                        >
+                          <FileText className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setShowShareDialog(true)}
+                        >
+                          <Share2 className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setShowSettings(true)}
+                        >
+                          <Settings className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </header>
+
+              {/* Chat messages */}
+              <main className="flex-1 overflow-y-auto p-3">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex flex-col">
+                    {messages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-start gap-2 mb-4 ${
+                          message.isUser ? "ml-auto flex-row-reverse" : ""
+                        } max-w-[85%]`}
+                      >
+                        {!message.isUser && selectedCharacter && (
+                          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                             <Image
                               src={
                                 getCurrentCharacter(selectedCharacter)
@@ -698,373 +893,592 @@ export default function MessagingInterface() {
                               }
                               alt={
                                 getCurrentCharacter(selectedCharacter)?.name ||
-                                ""
+                                "AI"
                               }
-                              width={24}
-                              height={24}
+                              width={40}
+                              height={40}
                               className="object-cover w-full h-full"
                             />
                           </div>
                         )}
-                        <SelectValue>
-                          {selectedCharacter && (
-                            <span className="truncate text-sm sm:text-base">
-                              {getCurrentCharacter(selectedCharacter)?.name} (
-                              {selectedCharacter.split("_")[0].toUpperCase()})
-                            </span>
-                          )}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <div className="p-2 border-b border-gray-200/10">
-                          <div className="flex items-center justify-between px-2 py-1.5">
-                            <span className="text-sm text-gray-400 font-medium">
-                              {showAnime ? "Anime" : "Regular"}
-                            </span>
-                            <div
-                              onClick={() => setShowAnime(!showAnime)}
-                              className={`
-                                relative inline-flex h-7 w-12 cursor-pointer rounded-full 
-                                transition-colors duration-200 ease-in-out
-                                ${
-                                  showAnime ? "bg-purple-600/25" : "bg-gray-700"
-                                }
-                              `}
-                            >
-                              <span
-                                className={`
-                                  absolute top-1 left-1 inline-block h-5 w-5 
-                                  transform rounded-full bg-white shadow-lg 
-                                  transition-transform duration-200 ease-in-out
-                                  ${
-                                    showAnime
-                                      ? "translate-x-5"
-                                      : "translate-x-0"
-                                  }
-                                  ${showAnime ? "bg-purple-500" : "bg-gray-200"}
-                                `}
-                              />
-                            </div>
+                        <div
+                          className={`p-3 rounded-lg ${
+                            message.isUser
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <p className="text-sm">{message.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {isTyping && (
+                      <div className="flex items-start gap-2 mb-4 max-w-[85%]">
+                        <Image
+                          src={
+                            getCurrentCharacter(selectedCharacter).avatar ||
+                            "/placeholder.svg"
+                          }
+                          alt="AI"
+                          width={32}
+                          height={32}
+                          className="rounded-full mt-1"
+                        />
+                        <div className="p-3 rounded-lg bg-muted">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce [animation-delay:-0.3s]"></span>
+                            <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce [animation-delay:-0.15s]"></span>
+                            <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce"></span>
                           </div>
                         </div>
-                        {Object.entries(characterGroups).map(
-                          ([groupKey, group]) => (
-                            <SelectGroup key={groupKey}>
-                              <SelectLabel>{group.title}</SelectLabel>
-                              {Object.entries(
-                                getFilteredCharacters(group.characters)
-                              ).map(([charKey, char]) => (
-                                <SelectItem key={charKey} value={charKey}>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                                      <Image
-                                        src={char.avatar}
-                                        alt={char.name}
-                                        width={32}
-                                        height={32}
-                                        className="object-cover"
-                                      />
-                                    </div>
-                                    <span>
-                                      {char.name} (
-                                      {charKey.split("_")[0].toUpperCase()})
-                                    </span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
+                      </div>
+                    )}
+                    <div ref={messageEndRef} />
                   </div>
+                </div>
+              </main>
 
-                  <div className="flex items-center gap-1">
+              {/* Chat input */}
+              <footer className="sticky bottom-0 bg-background border-t">
+                <form onSubmit={handleSubmit} className="p-2 sm:p-4">
+                  <div className="flex items-center gap-2">
+                    {user && !isSubscribed && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-10 w-auto sm:h-12 px-3 sm:px-4 shrink-0 bg-gradient-to-r from-purple-500/10 to-purple-400/20 hover:from-purple-500/20 hover:to-purple-400/30 border-purple-500/50 hover:border-purple-400 transition-all duration-300"
+                        onClick={() => setShowPremiumModal(true)}
+                      >
+                        <span className="text-sm font-medium bg-gradient-to-r from-purple-500 to-purple-400 text-transparent bg-clip-text">
+                          Pro
+                        </span>
+                      </Button>
+                    )}
+                    <Input
+                      ref={inputRef}
+                      placeholder="Type your message..."
+                      className="bg-muted h-10 sm:h-12 text-sm sm:text-base min-w-0"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                    />
                     <Button
-                      variant="ghost"
+                      type="submit"
                       size="icon"
-                      className="h-9 w-9"
-                      onClick={() => setShowAuthorNote(true)}
-                    >
-                      <FileText className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 relative"
-                      onClick={() => {
-                        navigator.clipboard.writeText(window.location.href);
-                        setShowCopied(true);
-                        setTimeout(() => setShowCopied(false), 2000);
+                      className="h-10 w-10 sm:h-12 sm:w-12 shrink-0"
+                      onClick={(e) => {
+                        if (!user && messages.length >= 10) {
+                          e.preventDefault();
+                          setShowSettings(true);
+                          return;
+                        }
+                        if (user && messages.length >= 15 && !isSubscribed) {
+                          e.preventDefault();
+                          setShowPremiumModal(true);
+                          return;
+                        }
                       }}
                     >
-                      {showCopied ? (
-                        <Check className="h-5 w-5" />
-                      ) : (
-                        <Share2 className="h-5 w-5" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9"
-                      onClick={() => setShowSettings(true)}
-                    >
-                      <Settings className="h-5 w-5" />
+                      <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
                   </div>
-                </>
-              )}
-            </header>
+                </form>
+              </footer>
+            </div>
+          </div>
 
-            {/* Add padding-top to main content to account for fixed header */}
-            <main className="flex-1 overflow-y-auto p-2 sm:p-4">
-              <div className="flex flex-col space-y-4">
-                <div className="flex flex-col">
-                  {messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-start gap-2 mb-4 ${
-                        message.isUser ? "ml-auto flex-row-reverse" : ""
-                      } max-w-[85%]`}
-                    >
-                      {!message.isUser && selectedCharacter && (
-                        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                          <Image
-                            src={
-                              getCurrentCharacter(selectedCharacter)?.avatar ||
-                              ""
-                            }
-                            alt={
-                              getCurrentCharacter(selectedCharacter)?.name ||
-                              "AI"
-                            }
-                            width={40}
-                            height={40}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                      )}
-                      <div
-                        className={`p-3 rounded-lg ${
-                          message.isUser
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
-                        }`}
+          {/* Features Section - hidden initially on mobile, shown after scroll */}
+          <PremiumCharacters />
+
+          {/* Personality Tests Section */}
+          <PersonalityTests />
+
+          {/* Personality Database Section */}
+          <PersonalityDatabase />
+
+          {/* Customer Reviews Section */}
+          <CustomerReviews />
+
+          {/* Call to Action Section */}
+          <CallToAction />
+
+          {/* Footer Section */}
+          <Footer />
+        </div>
+      );
+    }
+
+    // Return the existing chat interface for logged-in users or after first message
+    return (
+      <div className="flex h-[100dvh] bg-background max-w-[100vw] overflow-hidden">
+        {(user || shouldShowSidebar) &&
+          ((showChatList && isMobile) || !isMobile) && (
+            <div
+              className={`${
+                isMobile ? "fixed inset-0 z-50 bg-background" : ""
+              }`}
+            >
+              <ChatList
+                supabase={supabase}
+                userEmail={user?.email}
+                characterGroups={characterGroups}
+                onChatSelect={(character) => {
+                  if (character) {
+                    handleCharacterChange(character);
+                    setSelectedCharacter(character);
+                    setShowChatList(false);
+                  }
+                }}
+                selectedCharacter={selectedCharacter}
+                refreshTrigger={chatListRefresh}
+                onChatDelete={handleChatDelete}
+                onClose={() => setShowChatList(false)}
+                currentMessages={messages}
+              />
+            </div>
+          )}
+
+        <div className="flex-1 flex justify-center">
+          <div className="w-full max-w-3xl">
+            <div className="h-full flex flex-col">
+              <header className="flex items-center justify-between px-2 sm:px-4 py-2 border-b">
+                {selectedCharacter && (
+                  <>
+                    {/* Mobile chat list button */}
+                    {user && isMobile && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowChatList(true)}
                       >
-                        <p className="text-sm">{message.text}</p>
-                      </div>
+                        <MessageSquareText className="h-5 w-5" />
+                      </Button>
+                    )}
+
+                    {/* Random character button - show on desktop or when not logged in */}
+                    {(!user || !isMobile) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={async () => {
+                          setMessages([]);
+                          const newCharacter = getRandomCharacter();
+                          await handleCharacterChange(newCharacter);
+                        }}
+                      >
+                        <RefreshCcw className="h-4 w-4" />
+                      </Button>
+                    )}
+
+                    <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-center">
+                      <Select
+                        value={selectedCharacter}
+                        onValueChange={handleCharacterChange}
+                      >
+                        <SelectTrigger className="w-[180px] sm:w-[200px] flex items-center gap-2">
+                          {selectedCharacter && (
+                            <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
+                              <Image
+                                src={
+                                  getCurrentCharacter(selectedCharacter)
+                                    ?.avatar || ""
+                                }
+                                alt={
+                                  getCurrentCharacter(selectedCharacter)
+                                    ?.name || ""
+                                }
+                                width={24}
+                                height={24}
+                                className="object-cover w-full h-full"
+                              />
+                            </div>
+                          )}
+                          <SelectValue>
+                            {selectedCharacter && (
+                              <span className="truncate text-sm sm:text-base">
+                                {getCurrentCharacter(selectedCharacter)?.name} (
+                                {selectedCharacter.split("_")[0].toUpperCase()})
+                              </span>
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <div className="p-2 border-b border-gray-200/10">
+                            <div className="flex items-center justify-between px-2 py-1.5">
+                              <span className="text-sm text-gray-400 font-medium">
+                                {showAnime ? "Anime" : "Regular"}
+                              </span>
+                              <div
+                                onClick={() => setShowAnime(!showAnime)}
+                                className={`
+                                  relative inline-flex h-7 w-12 cursor-pointer rounded-full 
+                                  transition-colors duration-200 ease-in-out
+                                  ${
+                                    showAnime
+                                      ? "bg-purple-600/25"
+                                      : "bg-gray-700"
+                                  }
+                                `}
+                              >
+                                <span
+                                  className={`
+                                    absolute top-1 left-1 inline-block h-5 w-5 
+                                    transform rounded-full bg-white shadow-lg 
+                                    transition-transform duration-200 ease-in-out
+                                    ${
+                                      showAnime
+                                        ? "translate-x-5"
+                                        : "translate-x-0"
+                                    }
+                                    ${
+                                      showAnime
+                                        ? "bg-purple-500"
+                                        : "bg-gray-200"
+                                    }
+                                  `}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          {Object.entries(characterGroups).map(
+                            ([groupKey, group]) => (
+                              <SelectGroup key={groupKey}>
+                                <SelectLabel>{group.title}</SelectLabel>
+                                {Object.entries(
+                                  getFilteredCharacters(group.characters)
+                                ).map(([charKey, char]) => (
+                                  <SelectItem key={charKey} value={charKey}>
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                        <Image
+                                          src={char.avatar}
+                                          alt={char.name}
+                                          width={32}
+                                          height={32}
+                                          className="object-cover"
+                                        />
+                                      </div>
+                                      <span>
+                                        {char.name} (
+                                        {charKey.split("_")[0].toUpperCase()})
+                                      </span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
-                  ))}
-                  {isTyping && (
-                    <div className="flex items-start gap-2 mb-4 max-w-[85%]">
-                      <Image
-                        src={
-                          getCurrentCharacter(selectedCharacter).avatar ||
-                          "/placeholder.svg"
-                        }
-                        alt="AI"
-                        width={32}
-                        height={32}
-                        className="rounded-full mt-1"
-                      />
-                      <div className="p-3 rounded-lg bg-muted">
-                        <div className="flex gap-1">
-                          <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce [animation-delay:-0.3s]"></span>
-                          <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce [animation-delay:-0.15s]"></span>
-                          <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce"></span>
+
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9"
+                        onClick={() => setShowAuthorNote(true)}
+                      >
+                        <FileText className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 relative"
+                        onClick={() => {
+                          navigator.clipboard.writeText(window.location.href);
+                          setShowCopied(true);
+                          setTimeout(() => setShowCopied(false), 2000);
+                        }}
+                      >
+                        {showCopied ? (
+                          <Check className="h-5 w-5" />
+                        ) : (
+                          <Share2 className="h-5 w-5" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9"
+                        onClick={() => setShowSettings(true)}
+                      >
+                        <Settings className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </header>
+
+              <main className="flex-1 overflow-y-auto p-2 sm:p-4">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex flex-col">
+                    {messages.map((message, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-start gap-2 mb-4 ${
+                          message.isUser ? "ml-auto flex-row-reverse" : ""
+                        } max-w-[85%]`}
+                      >
+                        {!message.isUser && selectedCharacter && (
+                          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                            <Image
+                              src={
+                                getCurrentCharacter(selectedCharacter)
+                                  ?.avatar || ""
+                              }
+                              alt={
+                                getCurrentCharacter(selectedCharacter)?.name ||
+                                "AI"
+                              }
+                              width={40}
+                              height={40}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        )}
+                        <div
+                          className={`p-3 rounded-lg ${
+                            message.isUser
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <p className="text-sm">{message.text}</p>
                         </div>
                       </div>
-                    </div>
-                  )}
-                  <div ref={messageEndRef} /> {/* Add scroll anchor */}
+                    ))}
+                    {isTyping && (
+                      <div className="flex items-start gap-2 mb-4 max-w-[85%]">
+                        <Image
+                          src={
+                            getCurrentCharacter(selectedCharacter).avatar ||
+                            "/placeholder.svg"
+                          }
+                          alt="AI"
+                          width={32}
+                          height={32}
+                          className="rounded-full mt-1"
+                        />
+                        <div className="p-3 rounded-lg bg-muted">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce [animation-delay:-0.3s]"></span>
+                            <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce [animation-delay:-0.15s]"></span>
+                            <span className="w-2 h-2 rounded-full bg-foreground/25 animate-bounce"></span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={messageEndRef} />
+                  </div>
                 </div>
-              </div>
-            </main>
+              </main>
 
-            {/* Update footer with ref */}
-            <footer className="border-t">
-              <form onSubmit={handleSubmit} className="p-2 sm:p-4">
-                <div className="flex items-center gap-2">
-                  {user && !isSubscribed && (
+              <footer className="border-t">
+                <form onSubmit={handleSubmit} className="p-2 sm:p-4">
+                  <div className="flex items-center gap-2">
+                    {user && !isSubscribed && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-10 w-auto sm:h-12 px-3 sm:px-4 shrink-0 bg-gradient-to-r from-purple-500/10 to-purple-400/20 hover:from-purple-500/20 hover:to-purple-400/30 border-purple-500/50 hover:border-purple-400 transition-all duration-300"
+                        onClick={() => setShowPremiumModal(true)}
+                      >
+                        <span className="text-sm font-medium bg-gradient-to-r from-purple-500 to-purple-400 text-transparent bg-clip-text">
+                          Pro
+                        </span>
+                      </Button>
+                    )}
+                    <Input
+                      ref={inputRef}
+                      placeholder="Type your message..."
+                      className="bg-muted h-10 sm:h-12 text-sm sm:text-base min-w-0"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                    />
                     <Button
-                      type="button"
-                      variant="outline"
-                      className="h-10 w-auto sm:h-12 px-3 sm:px-4 shrink-0 bg-gradient-to-r from-purple-500/10 to-purple-400/20 hover:from-purple-500/20 hover:to-purple-400/30 border-purple-500/50 hover:border-purple-400 transition-all duration-300"
-                      onClick={() => setShowPremiumModal(true)}
+                      type="submit"
+                      size="icon"
+                      className="h-10 w-10 sm:h-12 sm:w-12 shrink-0"
+                      onClick={(e) => {
+                        if (!user && messages.length >= 10) {
+                          e.preventDefault();
+                          setShowSettings(true);
+                          return;
+                        }
+                        if (user && messages.length >= 15 && !isSubscribed) {
+                          e.preventDefault();
+                          setShowPremiumModal(true);
+                          return;
+                        }
+                      }}
                     >
-                      <span className="text-sm font-medium bg-gradient-to-r from-purple-500 to-purple-400 text-transparent bg-clip-text">
-                        Pro
-                      </span>
+                      <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
-                  )}
-                  <Input
-                    ref={inputRef}
-                    placeholder="Type your message..."
-                    className="bg-muted h-10 sm:h-12 text-sm sm:text-base min-w-0"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                  />
-                  <Button
-                    type="submit"
-                    size="icon"
-                    className="h-10 w-10 sm:h-12 sm:w-12 shrink-0"
-                    onClick={(e) => {
-                      if (!user && messages.length >= 10) {
-                        e.preventDefault();
-                        setShowSettings(true);
-                        return;
-                      }
-                      if (user && messages.length >= 15 && !isSubscribed) {
-                        e.preventDefault();
-                        setShowPremiumModal(true);
-                        return;
-                      }
-                    }}
-                  >
-                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </Button>
-                </div>
-              </form>
-            </footer>
+                  </div>
+                </form>
+              </footer>
+            </div>
           </div>
         </div>
-      </div>
 
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>
-              {user ? "Settings" : "Sign in to see your chats!"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4 py-4">
-            {user ? (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={user?.user_metadata?.avatar_url || "/placeholder.svg"}
-                    alt={user?.user_metadata?.full_name || "Profile"}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                    onError={(e) => {
-                      e.currentTarget.src = "/placeholder.svg";
-                    }}
-                  />
-                  <div>
-                    <p className="font-medium">
-                      {user.user_metadata?.full_name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Add Discord button */}
-                <Button
-                  onClick={() =>
-                    window.open("https://discord.gg/mrSkBn9F", "_blank")
-                  }
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 127.14 96.36"
-                  >
-                    <path
-                      d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"
-                      fill="#5865f2"
+        <Dialog open={showSettings} onOpenChange={setShowSettings}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>
+                {user ? "Settings" : "Sign in to see your chats!"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-4 py-4">
+              {user ? (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={
+                        user?.user_metadata?.avatar_url || "/placeholder.svg"
+                      }
+                      alt={user?.user_metadata?.full_name || "Profile"}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg";
+                      }}
                     />
-                  </svg>
-                  Join our Discord
-                </Button>
+                    <div>
+                      <p className="font-medium">
+                        {user.user_metadata?.full_name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
 
-                {/* Add Manage Subscription button for subscribed users */}
-                {isSubscribed && (
                   <Button
-                    onClick={() => {
-                      window.open(
-                        "https://billing.stripe.com/p/login/7sI3dG56y8Wb8OQ3cc"
-                      );
-                    }}
+                    onClick={() =>
+                      window.open("https://discord.gg/mrSkBn9F", "_blank")
+                    }
                     variant="outline"
                     className="flex items-center gap-2"
                   >
-                    Manage Subscription
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 127.14 96.36"
+                    >
+                      <path
+                        d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"
+                        fill="#5865f2"
+                      />
+                    </svg>
+                    Join our Discord
                   </Button>
-                )}
 
+                  {isSubscribed && (
+                    <Button
+                      onClick={() => {
+                        window.open(
+                          "https://billing.stripe.com/p/login/7sI3dG56y8Wb8OQ3cc"
+                        );
+                      }}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      Manage Subscription
+                    </Button>
+                  )}
+
+                  <Button
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setUser(null);
+                      setShowSettings(false);
+                      window.location.reload(); // Force reload to clear all states
+                    }}
+                    variant="outline"
+                  >
+                    Sign out
+                  </Button>
+                </div>
+              ) : (
                 <Button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    setUser(null);
-                    setShowSettings(false);
-                    window.location.reload(); // Force reload to clear all states
-                  }}
-                  variant="outline"
+                  onClick={handleGoogleSignIn}
+                  className="w-full flex items-center justify-center gap-2"
                 >
-                  Sign out
+                  <Image
+                    src="https://www.google.com/favicon.ico"
+                    alt="Google"
+                    width={20}
+                    height={20}
+                  />
+                  Sign in with Google
                 </Button>
-              </div>
-            ) : (
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <PremiumModal
+          open={showPremiumModal}
+          onOpenChange={setShowPremiumModal}
+        />
+
+        <Dialog open={showAuthorNote} onOpenChange={setShowAuthorNote}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Author's Note</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-4 py-4">
+              <Textarea
+                placeholder="Add context or specific instructions for the character..."
+                value={authorNote}
+                onChange={(e) => setAuthorNote(e.target.value)}
+                className="min-h-[100px]"
+              />
               <Button
-                onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-2"
+                onClick={async () => {
+                  localStorage.setItem("authorNote", authorNote);
+                  if (user?.email && selectedCharacter) {
+                    // Save to database if user is logged in
+                    await saveChat(supabase, {
+                      email: user.email,
+                      messages: messages,
+                      character_id: selectedCharacter,
+                    });
+                  }
+                  setShowAuthorNote(false);
+                }}
               >
-                <Image
-                  src="https://www.google.com/favicon.ico"
-                  alt="Google"
-                  width={20}
-                  height={20}
-                />
-                Sign in with Google
+                Save
               </Button>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  };
 
-      <PremiumModal
-        open={showPremiumModal}
-        onOpenChange={setShowPremiumModal}
-      />
+  useEffect(() => {
+    // Reset scroll position
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0; // For Safari
 
-      <Dialog open={showAuthorNote} onOpenChange={setShowAuthorNote}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Author's Note</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4 py-4">
-            <Textarea
-              placeholder="Add context or specific instructions for the character..."
-              value={authorNote}
-              onChange={(e) => setAuthorNote(e.target.value)}
-              className="min-h-[100px]"
-            />
-            <Button
-              onClick={async () => {
-                localStorage.setItem("authorNote", authorNote);
-                if (user?.email && selectedCharacter) {
-                  // Save to database if user is logged in
-                  await saveChat(supabase, {
-                    email: user.email,
-                    messages: messages,
-                    character_id: selectedCharacter,
-                  });
-                }
-                setShowAuthorNote(false);
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
+    // Temporarily fix position to ensure top loading
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+
+    // Remove the fixed position after a tiny delay to allow scrolling
+    setTimeout(() => {
+      document.body.style.position = "";
+      document.body.style.width = "";
+    }, 10);
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, []);
+
+  return renderLandingContent();
 }

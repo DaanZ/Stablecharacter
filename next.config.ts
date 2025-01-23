@@ -41,6 +41,7 @@ const nextConfig = {
       "www.google.com",
       "lh3.googleusercontent.com",
       "avatars.githubusercontent.com",
+      "upload.wikimedia.org",
     ],
   },
 };
